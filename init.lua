@@ -2,7 +2,11 @@
 -- Globals
 --
 
-biomedb = {}
+biomedb = {
+  settings = {
+    load_all = minetest.settings:get_bool("biomedb.load_all",false),
+  }
+}
 
 --
 -- Aggregates definition
@@ -38,13 +42,21 @@ end
 --
 
 local biomedb_biomes = {}
-local loaded_biomes = {}
+local loaded_mods = {}
 local game_id = minetest.get_game_info().id
 
 local dpath = minetest.get_modpath("biomedb") .. "/data/"
-local bgames = minetest.get_dir_list(dpath,true)
+local bgames = biomedb.settings.load_all and minetest.get_dir_list(dpath,true) or {game_id,"__mods"}
 for _,bgame in ipairs(bgames) do
-  local bmods = minetest.get_dir_list(dpath .. bgame,true)
+  local bmods = (function()
+    if biomedb.settings.load_all or bgame == game_id then
+      return minetest.get_dir_list(dpath .. bgame,true)
+    elseif bgame == "__mods" then
+      return minetest.get_modnames()
+    else
+      return {}
+    end
+  end)()
   for _,bmod in ipairs(bmods) do
     -- Get filesystem paths to database files
     local mpath = dpath .. bgame .. "/" .. bmod .. "/"
@@ -52,28 +64,30 @@ for _,bgame in ipairs(bgames) do
     local mmetadata = mpath .. "metadata/"
 
     -- Capture mod path
-    if loaded_biomes[bmod] == nil then
-      loaded_biomes[bmod] = minetest.get_modpath(bmod) or false
+    if loaded_mods[bmod] == nil then
+      loaded_mods[bmod] = minetest.get_modpath(bmod) or false
     end
 
-    -- Load in-memory database from database files
-    local bfiles = minetest.get_dir_list(mbiomes,false)
-    for _,bfile in ipairs(bfiles) do
-      local bdef = dofile(mbiomes .. bfile)
-      local mdef = dofile(mmetadata .. bfile)
-      for k,v in pairs(mdef) do
-        bdef[k] = v
+    -- Load biomes if biome mod is loaded or load_all is set
+    if loaded_mods[bmod] or biomedb.settings.load_all then
+      local bfiles = minetest.get_dir_list(mbiomes,false)
+      for _,bfile in ipairs(bfiles) do
+        local bdef = dofile(mbiomes .. bfile)
+        local mdef = dofile(mmetadata .. bfile)
+        for k,v in pairs(mdef) do
+          bdef[k] = v
+        end
+
+        -- Add runtime metadata
+        bdef.is_loaded = (bdef.game == nil or bdef.game == game_id) and
+        loaded_mods[bdef.mod] and
+        minetest.registered_biomes[bdef.name] and
+        true or false
+        bdef.annotate = annotate_biome
+
+        -- Index biome + metadata
+        biomedb_biomes[#biomedb_biomes + 1] = bdef
       end
-
-      -- Add runtime metadata
-      bdef.is_loaded = (bdef.game == nil or bdef.game == game_id) and
-      loaded_biomes[bdef.mod] and
-      minetest.registered_biomes[bdef.name] and
-      true or false
-      bdef.annotate = annotate_biome
-
-      -- Index biome + metadata
-      biomedb_biomes[#biomedb_biomes + 1] = bdef
     end
   end
 end

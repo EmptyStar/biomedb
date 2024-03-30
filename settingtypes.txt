@@ -1,0 +1,2 @@
+# Load all biomes at startup? Set to true to load all 1000+ biomes, false to only load biomes belonging to mods that are loaded
+biomedb.load_all (Load all 1000+ biomes?) bool false
