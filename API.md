@@ -123,7 +123,9 @@ Biomes that belong to a base biome have a `base` property set to the name of the
 
 ### `is_loaded`
 
-A boolean value that is `true` if the biome is loaded (i.e., its defining mod is loaded and the biome exists in `minetest.registered_biomes`) and `false` otherwise. This can be useful to select only those biomes that are active in the current Minetest environment.
+A boolean value that is `true` if the biome is loaded (i.e., its defining game and/or mod is loaded and the biome exists in `minetest.registered_biomes`) and `false` otherwise. This can be useful to select only those biomes that are active in the current Minetest environment.
+
+Note that this can be a little more specific than the behavior of [the `biomedb.load_all` setting](#settings) described below because it also takes into account `minetest.registered_biomes`. It's possible for a mod to be loaded but its biomes not actually registered, such as in Everness which has flags for enabling/disabling biomes or in Asuna which redefines biomes from other mods.
 
 ### `annotate`
 
@@ -145,3 +147,7 @@ local biomes = biomedb.select(function(biome)
 end)
 minetest.log("flower colors in grassy biomes: " .. table.concat(biomes:flowers(),", ")) -- returns "blue, yellow"
 ```
+
+## Settings
+
+BiomeDB has one configurable setting, `biomedb.load_all`, which is a boolean that can be set to `true` in order to load all 1000+ biomes. By default, BiomeDB only loads biomes that are associated with the current game and loaded mods.

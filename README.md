@@ -11,7 +11,7 @@ Common use cases for BiomeDB include:
 
 With BiomeDB, you can selectively query 1000+ biomes from popular mods and games without having to support each mod or game individually. You will also gain automatic future support for new biomes as they are added to BiomeDB.
 
-Note that BiomeDB's biome data is externally observed and collected from the mods it supports and isn't extracted from mods that are actually loaded. BiomeDB only documents and annotates biomes from popular mods. To analyze biomes that are actually loaded, refer to `minetest.registered_biomes`. Biomes from mods that aren't known to BiomeDB cannot be queried via BiomeDB.
+Note that BiomeDB's biome data is externally observed and collected from the mods it supports and isn't extracted from mods that are actually loaded. BiomeDB only documents and annotates biomes from popular mods. To analyze biomes that are actually loaded, refer to `minetest.registered_biomes` or the [`is_loaded` biome metadata property](https://github.com/EmptyStar/biomedb/blob/main/API.md#is_loaded). Biomes from mods that aren't known to BiomeDB cannot be queried via BiomeDB.
 
 Also note that BiomeDB does not document games/mods that implement biomes without the use of `minetest.registered_biomes`, such as Lord of the Test, Caverealms, and Dwarf Fortress Style Caverns. Excluded mods are mostly older mods that were created before the advent of engine-supported biomes.
 
@@ -54,7 +54,7 @@ minetest.register_decoration({
 
 Here, `biomes:node_top()` returns a list of `node_top` properties of all biomes in the `biomes` set. Likewise, `biomes:name()` returns a list of `name` properties of all biomes in the `biomes` set. Such functions exist for all string-based and/or table-based Minetest biome definition properties and all metadata properties.
 
-See API.md for more in-depth technical information about how to use these functions and features.
+See [API.md](https://github.com/EmptyStar/biomedb/blob/main/API.md) for more in-depth technical information about how to use these functions and features.
 
 Supported Biome Mods/Games
 --------------------------
